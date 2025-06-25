@@ -1,71 +1,57 @@
 import os
-import subprocess
 from flask import Flask, request, jsonify
+
+
+# Import modules
+from backend.config import OLLAMA_PATH, MODEL_NAME
+from backend.ollama_handler import query_model
+from backend.preprocess import preprocess_text
 
 app = Flask(__name__)
 
-# Configuration variables
-OLLAMA_MODEL = "deepseek-r1:1.5b"
-OLLAMA_PATH = os.getenv("OLLAMA_PATH", "ollama")
-
 # Endpoint to check the backend status
-@app.route("/status", methods = ["GET"])
+@app.route("/status", methods=["GET"])
 def status():
     return jsonify({
         "status": "running",
-        "model" : OLLAMA_MODEL
+        "model": MODEL_NAME
     })
-    
-# Endpoint for quering the model
-@app.route("/query", methods = ["POST"])
-def query_model():
-    try: 
+
+
+# Endpoint to query the model
+@app.route("/query", methods=["POST"])
+def query():
+    try:
         data = request.get_json()
         if not data or "prompt" not in data:
-            return jsonify({
-                "error": "Invalid request payload"
-            }), 400
+            return jsonify({"error": "Invalid request payload"}), 400
+
+        # Preprocess the prompt before sending it to the model
         prompt = data["prompt"]
-        
-        # Run the OLLAMA CLI command
-        command = [OLLAMA_PATH, "run", OLLAMA_MODEL, "--prompt", prompt]
-        res = subprocess.run(command, stdout=subprocess.PIPE, text = True)
-        
-        if res.returncode != 0:
-            return jsonify({
-                "error" : "Faild to communicate with the model"
-            }), 500
-            
-        return jsonify({
-            "response" : res.stdout.strip()
-        })
+        preprocessed_prompt = preprocess_text(prompt)
+
+        # Query the model
+        response = query_model(preprocessed_prompt, MODEL_NAME, OLLAMA_PATH)
+        return jsonify({"response": response})
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
-    
-# Endpoint for preprocessing the data
-@app.route("/preprocess", methods = ["POST"])
+        return jsonify({"error": str(e)}), 500
+
+
+# Endpoint to preprocess input (optional)
+@app.route("/preprocess", methods=["POST"])
 def preprocess():
     try:
         data = request.get_json()
         if not data or "input_text" not in data:
-            return jsonify({
-                "error" : "Invalid Request Payload"
-            }), 400
-            
+            return jsonify({"error": "Invalid request payload"}), 400
+
         input_text = data["input_text"]
-        
-        # preprocessing logic
-        processed_text = input_text.strip().lower()
-        return jsonify({
-            "processed_text" : processed_text
-        })
+        preprocessed_text = preprocess_text(input_text)
+
+        return jsonify({"preprocessed_text": preprocessed_text})
     except Exception as e:
-        return jsonify({
-            "error" : str(e)
-        }), 500
-        
-        
-if __name__ == "__main___":
-    app.run(host = "0.0.0.0", port = 11499, debug = True)
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
