@@ -1,128 +1,214 @@
-# Architecture Overview
+# DeepSeek AI Chatbot
 
-## Project Overview
+## Overview
 
-This project implements a locally hosted AI chatbot using the `deepseek-r1:1.5b` model via Ollama. It provides a modular design with a backend for managing model interactions and a frontend built using Streamlit or Gradio for user interaction. The project is designed to be scalable, maintainable, and user-friendly.
-
----
-
-## System Components
-
-### 1. **Backend**
-
-* **Role:** Manages interactions with the AI model and handles preprocessing of user inputs.
-* **Technologies:** Python, Ollama CLI
-* **Key Modules:**
-
-  * **`app.py`:** Serves as the main entry point for backend logic.
-  * **`ollama_handler.py`:** Interfaces with the Ollama `deepseek-r1:1.5b` model using subprocess calls.
-  * **`preprocess.py`:** (Optional) Handles data preprocessing, e.g., cleaning input text.
-  * **`config.py`:** Stores configuration settings such as file paths, API keys, and model parameters.
+DeepSeek AI Chatbot is a locally hosted, context-aware chatbot powered by the `deepseek-r1:1.5b` model. Designed for privacy and offline functionality, the chatbot is built with a modular architecture, featuring a robust backend, interactive frontend (Streamlit/Gradio), and seamless integration with the Ollama platform.
 
 ---
 
-### 2. **Frontend**
+## Features
 
-* **Role:** Provides an interactive user interface to communicate with the backend.
-* **Technologies:** Python, Streamlit/Gradio
-* **Options:**
-
-  * **Streamlit:** A dashboard-like application for input and output visualization.
-  * **Gradio:** A lightweight, customizable interface for testing and deployment.
-* **Key Features:**
-
-  * Accepts user input (text queries).
-  * Displays the AI model’s responses in real-time.
-  * Modular components for ease of customization.
+* **Privacy-first**: Runs locally, ensuring data security.
+* **Customizable Frontend**: Choose between Streamlit or Gradio interfaces.
+* **Modular Design**: Backend and frontend components are decoupled for scalability and ease of maintenance.
+* **AI-Powered**: Leverages the advanced capabilities of the `deepseek-r1:1.5b` model.
 
 ---
 
-### 3. **Model**
+## System Requirements
 
-* **Role:** Processes queries using the `deepseek-r1:1.5b` model.
-* **Technologies:** Ollama CLI
-* **Details:**
+* **Hardware:**
 
-  * Preloaded locally to ensure privacy and offline functionality.
-  * Accessed via CLI commands.
+  * Minimum 8 GB RAM (16 GB recommended)
+  * 4 CPU cores
+  * 10 GB free disk space
 
----
+* **Software:**
 
-### 4. **Testing**
+  * Python 3.8+
+  * Pip
+  * Ollama CLI (installed and configured)
+  * Supported OS:
 
-* **Role:** Ensures robustness and correctness of the application.
-* **Tools:** Python's `unittest` or `pytest`
-* **Scope:**
-
-  * Backend module tests for Ollama interaction.
-  * Frontend tests for user interface consistency.
-  * Integration tests for end-to-end functionality.
+    * Windows 10+
+    * macOS 10.15+
+    * Linux (Ubuntu 20.04 or later)
 
 ---
 
-### 5. **Data**
+## Installation
 
-* **Role:** Organizes raw and processed data used by the application.
-* **Structure:**
+### Step 1: Clone the Repository
 
-  * `data/raw/` for unprocessed data.
-  * `data/processed/` for cleaned and prepared datasets.
+```bash
+git clone <repository-url>
+cd project-root
+```
+
+### Step 2: Set Up Python Environment
+
+1. Create a virtual environment:
+
+   ```bash
+   python -m venv venv
+   ```
+2. Activate the virtual environment:
+
+   * **Windows:**
+
+     ```bash
+     venv\Scripts\activate
+     ```
+   * **Mac/Linux:**
+
+     ```bash
+     source venv/bin/activate
+     ```
+3. Install dependencies:
+
+   ```bash
+   pip install -r backend/requirements.txt
+   pip install -r frontend/requirements.txt
+   ```
+
+### Step 3: Install and Configure Ollama
+
+1. Install the Ollama CLI:
+
+   * Follow [Ollama's installation guide](https://ollama.com/docs/installation).
+2. Pull the `deepseek-r1:1.5b` model:
+
+   ```bash
+   ollama pull deepseek-r1:1.5b
+   ```
+
+### Step 4: Configure Environment Variables
+
+1. Create a `.env` file in the root directory:
+
+   ```plaintext
+   OLLAMA_PATH=/path/to/ollama
+   ```
+2. Adjust the `OLLAMA_PATH` to point to your local Ollama installation.
 
 ---
 
-### 6. **Documentation**
+## Running the Application
 
-* **Role:** Guides users and developers on system use and maintenance.
-* **Includes:**
+### Backend
 
-  * `architecture.md`: Overview of the system architecture.
-  * `api_docs.md`: API documentation for backend endpoints.
-  * `user_manual.md`: End-user instructions.
+Start the backend server:
+
+```bash
+python backend/app.py
+```
+
+The server runs on:
+
+```
+http://localhost:8000
+```
+
+### Frontend
+
+#### Option 1: Streamlit
+
+1. Run the Streamlit application:
+
+   ```bash
+   streamlit run frontend/streamlit_app.py
+   ```
+2. Open the displayed URL (e.g., `http://localhost:8501`).
+
+#### Option 2: Gradio
+
+1. Run the Gradio application:
+
+   ```bash
+   python frontend/gradio_app.py
+   ```
+2. Open the displayed URL (e.g., `http://localhost:7860`).
 
 ---
 
-## Architecture Diagram
+## Usage
+
+1. Enter your query in the frontend interface.
+2. Submit the query.
+3. View the response generated by the AI model.
+
+### Example Queries
+
+* **General:** "What is artificial intelligence?"
+* **Technical:** "Explain the difference between a neural network and a decision tree."
+* **Creative:** "Write a short story about a robot exploring space."
+
+---
+
+## Project Structure
 
 ```plaintext
-+----------------+        +------------------+        +-------------------+
-|    Frontend    | -----> |     Backend      | -----> |      Model        |
-| (Streamlit or  |        |  (Python-based)  |        | (deepseek-r1:1.5b)|
-|    Gradio)     |        +------------------+        +-------------------+
-+----------------+
-
-+----------------+
-|      Data      |
-|  (raw & clean) |
-+----------------+
-        ↳
-+----------------+
-| Documentation  |
-|  (Guides, API) |
-+----------------+
+project-root/
+├── backend/                # Backend logic
+├── frontend/               # Frontend logic
+├── models/                 # Model-related files
+├── data/                   # Data files
+├── tests/                  # Unit and integration tests
+├── docs/                   # Documentation files
+├── logs/                   # Logs for debugging
+├── .env                    # Environment variables
+├── README.md               # Main project documentation
+├── LICENSE                 # License information
+└── setup.py                # Python package setup
 ```
 
 ---
 
-## Key Design Principles
+## Troubleshooting
 
-1. **Modularity:**
+### Common Issues
 
-   * Independent components for backend, frontend, and model interactions.
-   * Simplifies maintenance and testing.
+1. **Model Not Found:**
 
-2. **Local Privacy:**
+   * Ensure the `deepseek-r1:1.5b` model is pulled using the Ollama CLI.
+   * Verify the `OLLAMA_PATH` in the `.env` file.
 
-   * AI model runs entirely locally, ensuring data privacy and reducing latency.
+2. **Backend Not Responding:**
 
-3. **Scalability:**
+   * Ensure the backend server is running (`python backend/app.py`).
+   * Check if another service is using port 8000.
 
-   * Flexible frontend options (Streamlit or Gradio) to accommodate diverse use cases.
-   * Potential for future integration with additional services.
+3. **Frontend Not Loading:**
+
+   * Ensure dependencies are correctly installed.
+   * Restart the frontend application.
+
+### Logs
+
+* Application logs can be found in the `logs/` directory:
+
+  * `app.log` for general logs.
+  * `errors.log` for error-specific logs.
 
 ---
 
 ## Future Enhancements
 
-* Add support for multi-model interaction.
-* Enhance frontend with advanced visualization tools.
-* Implement caching for faster responses.
+* Multi-language support.
+* Integration with additional AI models.
+* Enhanced visualization and UI improvements.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Contact
+
+* **Email:** [support@example.com](mailto:support@example.com)
+* **GitHub Issues:** [Project Repository](https://github.com/your-repository-link)
+
+Thank you for using the DeepSeek AI Chatbot!
